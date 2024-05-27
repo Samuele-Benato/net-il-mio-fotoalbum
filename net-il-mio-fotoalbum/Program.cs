@@ -1,10 +1,19 @@
+using net_il_mio_fotoalbum.Data;
+using System.Text.Json.Serialization;
+
 namespace net_il_mio_fotoalbum
 {
     public class Program
     {
         public static void Main(string[] args)
         {
+
+            PhotoManager.Seed();
+
             var builder = WebApplication.CreateBuilder(args);
+
+
+            builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using net_il_mio_fotoalbum.Data;
 
 namespace net_il_mio_fotoalbum.Controllers
 {
@@ -8,13 +9,13 @@ namespace net_il_mio_fotoalbum.Controllers
         // GET: PhotoController
         public ActionResult Index()
         {
-            return View();
+            return View(PhotoManager.GetPhotos());
         }
 
         // GET: PhotoController/Details/5
         public ActionResult Details(int id)
         {
-            return View();
+            return View(PhotoManager.GetPhoto(id));
         }
 
         // GET: PhotoController/Create

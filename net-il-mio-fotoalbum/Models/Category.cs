@@ -7,10 +7,9 @@
         public List<Photo> Photos { get; set; }
 
         public Category() { }
-        public Category(string title, List<Photo>? photos)
+        public Category(string title)
         {
             Title = title;
-            Photos  = photos;
         }
     }
 

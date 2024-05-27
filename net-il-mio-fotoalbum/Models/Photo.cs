@@ -11,13 +11,11 @@
         public List<Category>? Categories { get; set; }
 
         public Photo() { }
-        public Photo(string title, string description, byte[]? imageFile, bool visible, List<Category>? categories)
+        public Photo(string title, string description,  bool visible)
         {          
             Title = title;
             Description = description;
-            ImageFile = imageFile;
             Visible = visible;
-            Categories = categories;
         }
     }
 }
