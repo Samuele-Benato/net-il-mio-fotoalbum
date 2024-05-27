@@ -11,9 +11,8 @@
         public List<Category>? Categories { get; set; }
 
         public Photo() { }
-        public Photo(int id, string title, string description, byte[]? imageFile, bool visible, List<Category>? categories)
-        {
-            Id = id;
+        public Photo(string title, string description, byte[]? imageFile, bool visible, List<Category>? categories)
+        {          
             Title = title;
             Description = description;
             ImageFile = imageFile;

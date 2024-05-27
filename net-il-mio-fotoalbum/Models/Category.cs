@@ -7,6 +7,11 @@
         public List<Photo> Photos { get; set; }
 
         public Category() { }
+        public Category(string title, List<Photo>? photos)
+        {
+            Title = title;
+            Photos  = photos;
+        }
     }
 
     
