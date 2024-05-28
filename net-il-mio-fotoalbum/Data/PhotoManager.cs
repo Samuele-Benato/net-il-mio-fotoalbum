@@ -64,6 +64,49 @@ namespace net_il_mio_fotoalbum.Data
             db.SaveChanges();
         }
 
+        public static bool EditPhoto(int id, string title, string description,  byte[]? imagefile, bool visible, List<string>? categories)
+        {
+            using PhotoContext db = new PhotoContext();
+            var photo = db.Photos.Where(x => x.Id == id).Include(x => x.Categories).FirstOrDefault();
+
+            if (photo == null)
+                return false;
+
+            photo.Title = title;
+            photo.Description = description;
+            photo.Visible = visible;
+            photo.ImageFile = imagefile;
+
+            photo.Categories.Clear(); // Prima svuoto così da salvare solo le informazioni che l'utente ha scelto, NON le aggiungiamo ai vecchi dati
+            if (categories != null)
+            {
+                foreach (var category in categories)
+                {
+                    int categoryId = int.Parse(category);
+                    var categoryFromDb = db.Categories.FirstOrDefault(x => x.Id == categoryId);
+                    photo.Categories.Add(categoryFromDb);
+                }
+            }
+
+            db.SaveChanges();
+
+            return true;
+        }
+
+        public static bool DeletePhoto(int id)
+        {
+            using PhotoContext db = new PhotoContext();
+            var photo = db.Photos.FirstOrDefault(p => p.Id == id);
+
+            if (photo == null)
+                return false;
+
+            db.Photos.Remove(photo);
+            db.SaveChanges();
+
+            return true;
+        }
+
         public static void Seed()
         {
           
