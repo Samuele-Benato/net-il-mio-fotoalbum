@@ -38,6 +38,14 @@ namespace net_il_mio_fotoalbum.Data
                 return db.Photos.FirstOrDefault(p => p.Id == id);
         }
 
+        public static List<Photo> GetPhotosByName(string name)
+        {
+            using PhotoContext db = new PhotoContext();
+
+            // Rendo la ricerca case-insensitive convertendo tutto in minuscole
+            return db.Photos.Where(x => x.Title.ToLower().Contains(name.ToLower())).ToList();
+        }
+
         public static void InsertPhoto(Photo photo, List<string> SelectedCategories = null)
         {
             using PhotoContext db = new PhotoContext();

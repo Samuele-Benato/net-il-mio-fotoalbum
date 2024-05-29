@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form di Contatto</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Form di Contatto</h1>
+        <form id="contactForm">
+            <label for="title">Oggetto:</label>
+            <input type="text" id="title" name="title" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="message">Messaggio:</label>
+            <textarea id="message" name="message" required></textarea>
+
+            <button type="submit">Invia</button>
+        </form>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const data = {
+                Title: formData.get('title'),
+                Email: formData.get('email'),
+                Message: formData.get('message')
+            };
+
+            const url = 'https://localhost:7255/api/PhotoWebApi/PostContactMessage';
+
+            axios.post(url, data, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    alert('Messaggio inviato con successo!');
+                    console.log('Dati ricevuti dal server:', response.data);
+                })
+                .catch(error => {
+                    alert('Si è verificato un errore: ' + error.message);
+                    console.error('Errore:', error);
+                });
+        });
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+           
+        }
+
+        .container {
+            max-width: 80%;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 120px;
+        }
+
+        button[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+
+            button[type="submit"]:hover {
+                background-color: #0056b3;
+            }
+    </style>
+</body>
+</html>

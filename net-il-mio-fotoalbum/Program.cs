@@ -13,7 +13,7 @@ namespace net_il_mio_fotoalbum
             PhotoManager.Seed();
 
             var builder = WebApplication.CreateBuilder(args);
-                        var connectionString = builder.Configuration.GetConnectionString("PhotoContextConnection") ?? throw new InvalidOperationException("Connection string 'PhotoContextConnection' not found.");
+                        
 
                 builder.Services.AddDbContext<PhotoContext>();
 

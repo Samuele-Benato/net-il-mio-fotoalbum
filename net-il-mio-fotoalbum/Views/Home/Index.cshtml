@@ -1,8 +1,101 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Foto Album</title>
+    <style>
+        .photo-container {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+        }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+            .photo-container img {
+                max-width: 200px;
+                height: auto;
+            }
+    </style>
+</head>
+<body>
+    <h1>Album Fotografico</h1>
+
+    <h2>Foto</h2>
+    <div id="photosContainer"></div>
+
+    <h2>Cerca Foto per Nome</h2>
+    <input type="text" id="photoName" placeholder="Nome foto">
+    <button onclick="getPhotoByName()">Ottieni foto per nome</button>
+    <div id="getPhotoByNameResult"></div>
+
+    <script>
+        const baseUrl = 'https://localhost:7255/api/PhotoWebApi';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            getPhotos();
+        });
+
+        function getPhotos() {
+            fetch(`${baseUrl}/GetPhotos`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('GetPhotos response:', data);
+                    displayPhotos(data, 'photosContainer');
+                })
+                .catch(error => {
+                    document.getElementById('photosContainer').textContent = 'Errore: ' + error;
+                });
+        }
+
+        function getPhotoByName() {
+            const name = document.getElementById('photoName').value;
+            fetch(`${baseUrl}/GetPhotoByName/${name}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Foto non trovata!');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('GetPhotoByName response:', data);
+                    if (data) {
+                        displayPhoto(data, 'getPhotoByNameResult');
+                    } else {
+                        document.getElementById('getPhotoByNameResult').textContent = 'Foto non trovata!';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('getPhotoByNameResult').textContent = 'Errore: ' + error;
+                });
+        }
+
+        function displayPhotos(photos, elementId) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = '';
+            photos.forEach(photo => {
+                const photoElement = createPhotoElement(photo);
+                container.appendChild(photoElement);
+            });
+        }
+
+        function displayPhoto(photo, elementId) {
+            const container = document.getElementById(elementId);
+            container.innerHTML = '';
+            const photoElement = createPhotoElement(photo);
+            container.appendChild(photoElement);
+        }
+
+        function createPhotoElement(photo) {
+            console.log('Creating photo element for:', photo);
+            const div = document.createElement('div');
+            div.className = 'photo-container';
+            div.innerHTML = `
+                        <p><strong>Nome:</strong> ${photo.title ? photo.title : 'N/A'}</p>
+                        <p><strong>Descrizione:</strong> ${photo.description ? photo.description : 'N/A'}</p>
+                        ${photo.imgSrc ? `<img src="${photo.imgSrc}" alt="${photo.title}">` : '<p>Immagine non disponibile</p>'}
+                    `;
+            return div;
+        }
+    </script>
+</body>
+</html>
