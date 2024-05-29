@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using net_il_mio_fotoalbum.Data;
 using net_il_mio_fotoalbum.Models;
+using System.Security.Claims;
 
 namespace net_il_mio_fotoalbum.Controllers
 {
@@ -16,7 +18,13 @@ namespace net_il_mio_fotoalbum.Controllers
         // GET: PhotoController/Details/5
         public ActionResult Details(int id)
         {
-            return View(PhotoManager.GetPhoto(id));
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var photo = PhotoManager.GetPhoto(id, userId);
+            if (photo == null && !User.IsInRole("SuperAdmin"))
+            {
+                return Unauthorized();
+            }
+            return View(photo);
         }
 
         // GET: PhotoController/Create
@@ -38,10 +46,10 @@ namespace net_il_mio_fotoalbum.Controllers
                 if (!ModelState.IsValid)
                 {
                     data.CreateCategories();
-
                     return View("Create", data);
                 }
 
+                data.Photo.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 data.SetImageFileFromFormFile();
 
                 PhotoManager.InsertPhoto(data.Photo, data.SelectedCategories);
@@ -56,11 +64,12 @@ namespace net_il_mio_fotoalbum.Controllers
         // GET: PhotoController/Edit/5
         public ActionResult Edit(int id)
         {
-            var photoToEdit = PhotoManager.GetPhoto(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var photoToEdit = PhotoManager.GetPhoto(id, userId);
 
-            if(photoToEdit == null)
+            if (photoToEdit == null && !User.IsInRole("SuperAdmin"))
             {
-               return RedirectToAction(nameof(Edit));
+                return Unauthorized();
             }
 
             PhotoFormModel model = new PhotoFormModel(photoToEdit);
@@ -82,19 +91,23 @@ namespace net_il_mio_fotoalbum.Controllers
                 }
 
                 data.SetImageFileFromFormFile();
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
                 if (PhotoManager.EditPhoto(
-                id,
-                data.Photo.Title,
-                data.Photo.Description,               
-                data.Photo.ImageFile,
-                data.Photo.Visible,
-                data.SelectedCategories))
-
+                    id,
+                    userId,
+                    data.Photo.Title,
+                    data.Photo.Description,
+                    data.Photo.ImageFile,
+                    data.Photo.Visible,
+                    data.SelectedCategories))
+                {
                     return RedirectToAction(nameof(Index));
-
+                }
                 else
+                {
                     return RedirectToAction(nameof(Edit));
+                }
             }
             catch
             {
@@ -105,7 +118,13 @@ namespace net_il_mio_fotoalbum.Controllers
         // GET: PhotoController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var photo = PhotoManager.GetPhoto(id, userId);
+            if (photo == null && !User.IsInRole("SuperAdmin"))
+            {
+                return Unauthorized();
+            }
+            return View(photo);
         }
 
         // POST: PhotoController/Delete/5
@@ -115,12 +134,28 @@ namespace net_il_mio_fotoalbum.Controllers
         {
             try
             {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                if (!PhotoManager.DeletePhoto(id, userId) && !User.IsInRole("SuperAdmin"))
+                {
+                    return Unauthorized();
+                }
+
                 return RedirectToAction(nameof(Index));
             }
             catch
             {
                 return View();
             }
+        }
+
+        [Authorize(Roles = "SuperAdmin")]
+        public ActionResult Hide(int id)
+        {
+            if (!PhotoManager.HidePhoto(id))
+            {
+                return NotFound();
+            }
+            return RedirectToAction(nameof(Index));
         }
     }
 }
