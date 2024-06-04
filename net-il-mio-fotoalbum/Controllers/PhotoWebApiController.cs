@@ -13,7 +13,7 @@ namespace net_il_mio_fotoalbum.Controllers
         [HttpGet("{name?}")]
         public IActionResult GetPhotos() 
         {            
-            return Ok(PhotoManager.GetPhotos());
+            return Ok(PhotoManager.GetVisiblePhotos());
         }
 
         [HttpGet("{name}")]

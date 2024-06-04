@@ -55,14 +55,13 @@
                     <div class="mb-3">
                         <strong>Immagine:</strong>
                         <input asp-for="ImageFormFile" class="custom-form-control d-block w-100" type="file" />
-                    </div> 
+                    </div>
 
                     <div class="mb-3">
-                        <div class="d-inline-block w-58">
-                            <strong class="d-block">Prezzo:</strong>
-                            <input asp-for="Photo.Visible" type="checkbox" class="custom-form-control w-100" />
-                            <strong><span asp-validation-for="Photo.Visible" class="text-muted"></span></strong>
-                        </div>
+                        <form asp-controller="Photo" asp-action="Hide" method="post">
+                            <input type="hidden" name="id" value="@Model.Photo.Id" />
+                            <button type="submit">Nascondi foto</button>
+                        </form>
 
                         <div class="d-inline-block w-40 text-end">
                             <button type="submit" class="border-0 update-button">

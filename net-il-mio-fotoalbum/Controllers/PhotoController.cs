@@ -16,10 +16,11 @@ namespace net_il_mio_fotoalbum.Controllers
         }
 
         // GET: PhotoController/Details/5
+        [Authorize(Roles = "SuperAdmin,Admin,User")]
         public ActionResult Details(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var photo = PhotoManager.GetPhoto(id, userId);
+            var photo = PhotoManager.GetPhoto(id);
             if (photo == null && !User.IsInRole("SuperAdmin"))
             {
                 return Unauthorized();
@@ -28,6 +29,7 @@ namespace net_il_mio_fotoalbum.Controllers
         }
 
         // GET: PhotoController/Create
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public ActionResult Create()
         {
             PhotoFormModel model = new PhotoFormModel(new Photo());
@@ -37,6 +39,7 @@ namespace net_il_mio_fotoalbum.Controllers
         }
 
         // POST: PhotoController/Create
+        [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(PhotoFormModel data)
@@ -49,7 +52,6 @@ namespace net_il_mio_fotoalbum.Controllers
                     return View("Create", data);
                 }
 
-                data.Photo.UserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 data.SetImageFileFromFormFile();
 
                 PhotoManager.InsertPhoto(data.Photo, data.SelectedCategories);
@@ -62,10 +64,11 @@ namespace net_il_mio_fotoalbum.Controllers
         }
 
         // GET: PhotoController/Edit/5
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public ActionResult Edit(int id)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var photoToEdit = PhotoManager.GetPhoto(id, userId);
+           
+            var photoToEdit = PhotoManager.GetPhoto(id);
 
             if (photoToEdit == null && !User.IsInRole("SuperAdmin"))
             {
@@ -80,6 +83,7 @@ namespace net_il_mio_fotoalbum.Controllers
         // POST: PhotoController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "SuperAdmin,Admin")]
         public ActionResult Edit(int id, PhotoFormModel data)
         {
             try
@@ -91,11 +95,10 @@ namespace net_il_mio_fotoalbum.Controllers
                 }
 
                 data.SetImageFileFromFormFile();
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                
 
                 if (PhotoManager.EditPhoto(
-                    id,
-                    userId,
+                    id,                  
                     data.Photo.Title,
                     data.Photo.Description,
                     data.Photo.ImageFile,
@@ -115,37 +118,16 @@ namespace net_il_mio_fotoalbum.Controllers
             }
         }
 
-        // GET: PhotoController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var photo = PhotoManager.GetPhoto(id, userId);
-            if (photo == null && !User.IsInRole("SuperAdmin"))
-            {
-                return Unauthorized();
-            }
-            return View(photo);
-        }
-
         // POST: PhotoController/Delete/5
+        [Authorize(Roles = "SuperAdmin,Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public IActionResult Delete(int id)
         {
-            try
-            {
-                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (!PhotoManager.DeletePhoto(id, userId) && !User.IsInRole("SuperAdmin"))
-                {
-                    return Unauthorized();
-                }
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            if (PhotoManager.DeletePhoto(id))
+                return RedirectToAction("Index");
+            else
+                return NotFound();
         }
 
         [Authorize(Roles = "SuperAdmin")]

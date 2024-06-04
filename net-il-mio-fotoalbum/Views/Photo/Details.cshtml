@@ -1,4 +1,4 @@
-﻿@model net_il_mio_fotoalbum.Models.Photo
+﻿@model Photo;
 
 @{
     ViewData["Title"] = "Details";
@@ -33,11 +33,11 @@
         </dt>
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Visible)
-        </dd>
+        </dd>       
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
-    ! <a href="@Url.Action("Edit", "Photo", new { id = Model.Id })"></a>
+   
 </div>
